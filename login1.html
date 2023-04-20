@@ -9,7 +9,6 @@
     <script src="rsa.js"></script>
     <script src="rsa_decrypt.js"></script>
     <script src="rsa_encrypt.js"></script>
-    <script src="demo.js"></script>
     <script src="url_config.js"></script>
     <title>Title</title>
     <link rel="stylesheet" type="text/css" href="style.css">
@@ -124,7 +123,7 @@
                 complete: function(data) {
                     console.log(data);
                     resultcode = data.responseJSON.resultCode;
-                    if(email_resultcode == "1"){
+                    // if(email_resultcode == "1"){
                         if(resultcode == "1"){
                         // console.log(resultcode);
                         document.getElementById("loginHint").innerHTML="Login success!";
@@ -145,9 +144,9 @@
                         }else{
                             document.getElementById("loginHint").innerHTML="Wrong password or email.";
                         }
-                    } else {
-                        document.getElementById("loginHint").innerHTML="Something went wrong.";
-                    }
+                    // } else {
+                    //     document.getElementById("loginHint").innerHTML="Something went wrong.";
+                    // }
 
                     
                 },
