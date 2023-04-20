@@ -13,6 +13,7 @@
     <script src="rsa_decrypt.js"></script>
     <script src="rsa_encrypt2.js"></script>
     <script src="demo.js"></script>
+    <script src="url_config.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body style="background-color: #002C6D;">
@@ -54,7 +55,7 @@
         $.ajax({
                 type: "get",
                 dataType: "json",
-                url: "http://10.11.33.103:8088/estate/request-self-estate-info",//url
+                url: returnServerURL()+"/estate/request-self-estate-info",//url
                 data:  {'id': id},
                 complete: function(data) {
                     console.log(data);
@@ -109,7 +110,7 @@
         $.ajax({
                 type: "get",
                 dataType: "json",
-                url: "http://10.11.33.103:8088/transaction/accept-transaction",//url
+                url: returnServerURL()+"/transaction/accept-transaction",//url
                 data:  {'userId': estateOwnerId,'estateId': estateId},
                 complete: function(data) {
                     console.log(data);
@@ -137,7 +138,7 @@
         $.ajax({
                 type: "post",
                 dataType: "json",
-                url: "http://10.11.33.103:8088/transaction/insert-transaction",//url
+                url: returnServerURL()+"/transaction/insert-transaction",//url
                 data:  {'buyerId': sign.buyerId,'sellerId': sign.sellerId,'transString1':second_sign[0],'transString2':second_sign[1]},
                 complete: function(data) {
                     console.log(data);

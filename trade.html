@@ -13,6 +13,7 @@
     <script src="rsa_decrypt.js"></script>
     <script src="rsa_encrypt.js"></script>
     <script src="demo.js"></script>
+    <script src="url_config.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body style="background-color: #002C6D;">
@@ -38,10 +39,6 @@
             </div>
 
             
-
-<!--            <div class="photos">-->
-<!--                <div class="row row-padded" id="commodityId"></div>-->
-<!--	        </div>-->
             <div class="photos" id="commodityId"></div>
         </div>
     </div>
@@ -59,7 +56,7 @@
         $.ajax({
                 type: "get",
                 dataType: "json",//json or text?
-                url: "http://10.11.33.103:8088/estate/request-all-estate-info",//url
+                url: returnServerURL() + "/estate/request-all-estate-info",//url
                 data:  {'id': id},
                 complete: function(data) {
                     console.log(data);
@@ -127,7 +124,6 @@
         popout_container.appendChild(popout_btncontainer);
         document.body.appendChild(popout_container);
 
-          // 设置点击OK按钮时的处理函数
           okButton.onclick = function() {
               var reg = /^[0-9]*$/;
               document.body.removeChild(popout_container);
@@ -143,7 +139,6 @@
               // confirm("Transaction is successful!")
           };
 
-          // 设置点击Cancel按钮时的处理函数
           cancelButton.onclick = function() {
             document.body.removeChild(popout_container);
           };
@@ -162,8 +157,8 @@
         console.log(jsonString);
         $.ajax({
             type: "get",
-            dataType: "json",//json or text?
-            url: "http://10.11.33.103:8088/transaction/request-transaction",//url
+            dataType: "json",
+            url: returnServerURL()+"/transaction/request-transaction",//url
             data:  {'userId': buyerId,'buyer_signature': encrypted_json},
             complete: function(data) {
                 console.log(data);
@@ -190,7 +185,7 @@
 
     function Logout(){
         localStorage.clear();
-        // window.open(encodeURI('./login1.html'));
+        window.open(encodeURI('./login1.html'));
     }
 
 

@@ -10,7 +10,7 @@
     <script src="rsa_decrypt.js"></script>
     <script src="rsa_encrypt.js"></script>
     <script src="demo.js"></script>
-    <script src="Cookie.js"></script>
+    <script src="url_config.js"></script>
     <title>Title</title>
     <link rel="stylesheet" type="text/css" href="style.css">
 </head>
@@ -60,7 +60,7 @@
         $.ajax({
                 type: "get",
                 dataType: "json",
-                url: "http://10.11.33.103:8088/user-login/email-login",//url
+                url: returnServerURL()+"/user-login/email-login",//url
                 data:  {'email':$('#email').val()},
                 complete: function(data) {
                     console.log(data);
@@ -119,7 +119,7 @@
             $.ajax({
                 type: "get",
                 dataType: "json",
-                url: "http://10.11.33.103:8088/user-login/password-verify",//url
+                url: returnServerURL()+"/user-login/password-verify",//url
                 data:  {'email':$('#email').val(),'encryptedKey':encryptedData},
                 complete: function(data) {
                     console.log(data);
@@ -166,7 +166,7 @@
         $.ajax({
                 type: "get",
                 dataType: "json",
-                url: "http://10.11.33.103:8088/user-login/connect-establishment",//url
+                url: returnServerURL()+"/user-login/connect-establishment",//url
                 
                 data:  {'id': id,'publicKey':client_key[0]},
                 complete: function(data) {

@@ -5,8 +5,8 @@ const plaintext = "Hello, World!"; // plaintext
 
 // encryption
 const ciphertext = rsaEncrypt( plaintext, publicKeyString);
-console.log("加密后的密文: " + ciphertext);
+console.log("encrypted: " + ciphertext);
 
 // decryption
 const decryptedText = rsaDecrypt(ciphertext,privateKeyString);
-console.log("解密后的明文: " + decryptedText);}
+console.log("decrypted: " + decryptedText);}

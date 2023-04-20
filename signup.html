@@ -3,6 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/forge/0.10.0/forge.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsencrypt/3.0.0-rc.1/jsencrypt.min.js"></script>
+    <script src="rsa.js"></script>
+    <script src="rsa_decrypt.js"></script>
+    <script src="rsa_encrypt.js"></script>
+    <script src="demo.js"></script>
+    <script src="url_config.js"></script>
     <title>Title</title>
 </head>
 <body>
@@ -60,7 +69,6 @@
 </body>
 </html>
 
-<!-- wumeijia2019@hotmail.com -->
 <script rel="javascript" type="text/javascript">
     var email_resultcode;
     var verify_resultcode;
@@ -71,7 +79,7 @@
             $.ajax({
                 type: "get",
                 dataType: "json",//json or text?
-                url: "http://10.11.33.103:8088/user-login/email-verify",//url
+                url: returnServerURL()+"/user-login/email-verify",//url
                 data:  {'to':$('#email').val()},
                 complete: function(data) {
                     console.log(data);
@@ -101,7 +109,7 @@
                     $.ajax({
                     type: "post",
                     dataType: "json",
-                    url: "http://10.11.33.103:8088/user-login/register",//url
+                    url: returnServerURL()+"/user-login/register",//url
                     data:  {'userEmail':$('#email').val(),'userPassword':$('#passwd').val(),'verificationCode':$('#code').val()},//aes加密？
                     complete: function(data) {
                         console.log(data);
