@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <!-- <script src="js/getUrlParam.js"></script>  -->
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/forge/0.10.0/forge.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsencrypt/3.0.0-rc.1/jsencrypt.min.js"></script>
+    <script src="rsa.js"></script>
+    <script src="rsa_decrypt.js"></script>
+    <script src="rsa_encrypt.js"></script>
+    <script src="demo.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body style="background-color: #002C6D;">
+    <div class = "banner">
+        <div class = "navbar">
+            <img src="images/logo.png" class="logo" alt="logo">
+            <div>
+                <a href="home.html"><button type="button">Home</button></a>
+                <a href="login1.html"><button type="button" onclick="Logout()">Log Out</button></a>
+            </div>
+
+        </div>
+        <div class="container">
+
+            <div class = "intro">
+                <div class="slogan">
+                    <h1>Start Your Trade</h1>
+                    <p>More than 100 building and housing projects that we have offered.
+                        <br>The building owner chose us over other trading platform around the world,
+                        <br>because our platform brings you unique experience.
+                    </p>
+                </div>
+            </div>
+
+            
+
+<!--            <div class="photos">-->
+<!--                <div class="row row-padded" id="commodityId"></div>-->
+<!--	        </div>-->
+            <div class="photos" id="commodityId"></div>
+        </div>
+    </div>
+    <script>
+    var jsonArray = [];
+    var id;
+
+    window.onload = function(){
+        id = localStorage.getItem('id');
+        var encrypted_data;
+        console.log(id);
+        var privateKey;
+
+
+        $.ajax({
+                type: "get",
+                dataType: "json",//json or text?
+                url: "http://10.11.33.103:8088/estate/request-all-estate-info",//url
+                data:  {'id': id},
+                complete: function(data) {
+                    console.log(data);
+                    get_data = data.responseJSON.data;
+                    privateKey = localStorage.getItem('client_privateKey');
+                    for (var i in get_data){
+                        console.log(jsonArray);
+                        jsonArray.push(eval(get_data[i]));
+                        console.log(eval(get_data[i]));
+                    }
+                    console.log(jsonArray);
+                    loadCommodity();
+                },
+                error: function (data) {
+                    console.log(data);
+                }
+            });
+    }
+
+
+    function loadCommodity() {
+        let htmllet = "";
+        for (var i = 0; i < jsonArray.length; i++) {
+                htmllet +=
+                    '<div class="photo">' +
+                        '<img src="images/'+getRandomImageName()+'">'+
+                        '<h3>' + jsonArray[i].estateName + '</h3>' +
+                        '<p>' + jsonArray[i].estateDescription + '</p >' +
+                        '<p>' + jsonArray[i].estateOwnerId + '</p >' +
+                        '<p>' + '$ ' + jsonArray[i].estatePrice +
+
+
+                        '<div>' +
+                        '<button class="fs-1" type="submit" id="bid" onclick="purpur('+jsonArray[i].estateId+','+jsonArray[i].estateOwnerId+','+id+','+jsonArray[i].estatePrice+')">'
+                            +'Purchase'
+                        +'</button>'+
+                        '</div>' +
+                    '</div>'
+        }
+        console.log(htmllet);
+        document.getElementById("commodityId").innerHTML = htmllet;
+    }
+    var purchase_value;
+    function purpur(estateId,sellerId,buyerId,estatePrice){
+        var popout_container = document.createElement("div")
+        popout_container.classList.add("centered-popout")
+        var popout_btncontainer = document.createElement("div")
+
+        var input = document.createElement("input");
+        input.id = "inputId"
+        var message = document.createTextNode("Bid Price:")
+        input.type = "text";
+        input.placeholder = "price in hkd";
+
+        var okButton = document.createElement("button");
+        okButton.textContent = "OK";
+        var cancelButton = document.createElement("button");
+        cancelButton.textContent = "Cancel";
+        popout_btncontainer.appendChild(okButton)
+        popout_btncontainer.appendChild(cancelButton)
+
+        popout_container.appendChild(message);
+        popout_container.appendChild(input);
+        // popout_container.appendChild(message);
+        popout_container.appendChild(popout_btncontainer);
+        document.body.appendChild(popout_container);
+
+          // 设置点击OK按钮时的处理函数
+          okButton.onclick = function() {
+              var reg = /^[0-9]*$/;
+              document.body.removeChild(popout_container);
+              if (!reg.test($('#inputId').val()) && input.value === ""){
+                  alert("Input a bid price!");
+              }else if (input.value&&input.value <= estatePrice ){
+                  console.log(input.value)
+                  alert("Your bid price is lower or equal to current price.");
+              }else{
+                 console.log("input"+input.value)
+                 Purchase(estateId,sellerId,buyerId,estatePrice);
+              }
+              // confirm("Transaction is successful!")
+          };
+
+          // 设置点击Cancel按钮时的处理函数
+          cancelButton.onclick = function() {
+            document.body.removeChild(popout_container);
+          };
+          return true;
+    }
+ 
+    function Purchase(estateId,sellerId,buyerId,estatePrice){
+        var reg = /^[0-9]*$/;
+
+        console.log(purchase_value);
+
+        var jsonString = "{\"estateId\": "+estateId+", \"sellerId\": "+sellerId+", \"estatePrice\": "+estatePrice+"}";
+
+        var encrypted_json = rsaEncrypt(jsonString, localStorage.getItem('server_static_publicKey'));
+
+        console.log(jsonString);
+        $.ajax({
+            type: "get",
+            dataType: "json",//json or text?
+            url: "http://10.11.33.103:8088/transaction/request-transaction",//url
+            data:  {'userId': buyerId,'buyer_signature': encrypted_json},
+            complete: function(data) {
+                console.log(data);
+                var resultCode = data.responseJSON.resultCode;
+                if (resultCode == "1"){
+                    alert("request transaction sent");
+                } else {
+                    alert("request transaction reject: invalid request");
+                }
+            },
+            error: function (data) {
+                console.log(data);
+                alert("network error");
+            }
+        });
+
+        
+
+    }
+
+    function getRandomImageName(){
+				return "i"+(Math.floor(Math.random()*(5))+1)+".jpeg";
+	}
+
+    function Logout(){
+        localStorage.clear();
+        // window.open(encodeURI('./login1.html'));
+    }
+
+
+
+</script>
+</body>
+</html>

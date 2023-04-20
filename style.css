@@ -1,0 +1,237 @@
+.banner{
+    width: 100%;
+    height: 100vh;
+    /*background-color:rgba(0,0,0,0.5);*/
+    background-image: linear-gradient(rgba(0,0,0,0.25),rgba(0,0,0,0.25)),url("images/bg.png");
+    background-size: cover;
+    background-position: center;
+}
+.transaction{
+    width: 100%;
+    height: 100vh;
+    background-color: grey;
+    background-size: cover;
+    background-position: center;
+}
+.logo{
+    width: 200px;
+    height: auto
+}
+.navbar{
+    width: 85%;
+    margin: auto;
+    padding: 35px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.navbar button{
+    list-style: none;
+    color: #fff;
+    display: inline-block;
+    margin: 0 20px;
+    position: relative;
+    font-family: "Helvetica",serif;
+    font-weight: bold;
+    font-size: 18px;
+    background: transparent;
+    border: none;
+}
+/*.navbar button a{*/
+/*    text-decoration: none;*/
+/*    color: #fff;*/
+/*    font-family: "Helvetica",serif;*/
+/*    font-weight: bold;*/
+/*    font-size: 18px;*/
+/*}*/
+.navbar button::after{
+    content: '';
+    height: 3px;
+    width: 0;
+    background: cornflowerblue;
+    position: absolute;
+    left: 0;
+    bottom: -10px;
+    transition: 0.5s;
+}
+.navbar button:hover::after{
+    width: 100%;
+}
+.slogan{
+    width: 100%;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    text-align: center;
+    text-decoration: none;
+    color: #fff;
+    font-family: "Helvetica",serif;
+}
+.slogan h1{
+    font-size: 70px;
+    margin-top: 80px;
+    font-weight: bolder;
+}
+.slogan p{
+    margin: 20px auto;
+    font-weight: 100;
+    line-height: 25px;
+}
+.user_info{
+    width: 100%;
+    position: absolute;
+    top: 60%;
+    text-align: center;
+    transform: translateY(-50%);
+    text-decoration: none;
+    color: #fff;
+    font-family: "Helvetica",serif;
+}
+.user_info h1{
+    font-size: 70px;
+    font-weight: bolder;
+}
+
+.user_info input{
+    font-family: "Helvetica",serif;
+    color:#fff;
+    background-color: rgba(255, 255, 255, 0.25);
+    padding-left: 8px;
+    border-radius: 8px;
+    border-style: groove;
+    border-color: white;
+}
+.user_info button{
+    font-family: "Helvetica",serif;
+    color: white;
+    padding: 15px 25px;
+    background-color: #4269e2;
+    border-radius: 15px;
+    border: none;
+}
+
+.fs-1 {
+    font-size: calc(1rem + 0.3vw) !important;
+}
+.fs-2 {
+    font-size: calc(0.5rem + 0.3vw) !important;
+}
+.mb-1 {
+    margin-bottom: 1rem !important;
+}
+.intro{
+    width: 100%;
+    height: 100%;
+}
+.container{
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    scroll-snap-type: y mandatory;
+    color:#fff;
+}
+.trading{
+    text-align: center;
+    color: #fff;
+    font-family: "Helvetica",serif;
+    font-size: 18px;
+
+}
+.trading p{
+    margin: 20px auto;
+    font-weight: 100;
+    line-height: 25px;
+}
+.photos {
+	display: flex;
+	flex-wrap: wrap;
+    position: center;
+    /*text-align: center;*/
+    color: #ffffff;
+    font-family: "Helvetica",serif;
+}
+.photo {
+    flex-basis: 33%;
+    margin-top: 20px;
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.photo p{
+    color: #ffffff;
+}
+.photo input{
+    font-family: "Helvetica",serif;
+    color:#fff;
+    background-color: transparent;
+    padding-left: 8px;
+    border-radius: 8px;
+    border-style: groove;
+    border-color: white;
+    margin-left: 5px;
+}
+.photo button{
+    font-family: "Helvetica",serif;
+    color: white;
+    padding: 15px 25px;
+    background-color: #4269e2;
+    border-radius: 18px;
+    border: 1px solid white;
+    margin-top: 10px;
+}
+/*.photos p{*/
+/*    color: #ffffff;*/
+/*    text-align: center;*/
+/*}*/
+
+.photo img {
+	width: 300px;
+	height: 300px;
+}
+.owner{
+	font-weight: bold;
+}
+.trading img{
+    width: 300px;
+	height: 300px;
+}
+.centered-popout {
+    font-family: "Helvetica",serif;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    border: 1px solid black;
+    padding: 20px;
+    text-align: center;
+}
+.centered-popout button{
+
+    display: inline-block;
+    margin-top: 10px;
+    margin-left: 10px;
+    width: 100px;
+    height: 30px;
+    font-size: 16px;
+    background-color: #ccc;
+    border: none;
+    border-radius: 5px;
+}
+
+.centered-popout button:first-child{
+    background-color: #4269e2;
+    color: white;
+    margin-right: 10px;
+}
+
+.bubutn button{
+    font-family: "Helvetica",serif;
+    color: white;
+    margin-left:10px;
+    width: 100px;
+    height: 50px;
+    background-color: #4269e2;
+    border-radius: 15px;
+    border: none;
+}

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/forge/0.10.0/forge.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsencrypt/3.0.0-rc.1/jsencrypt.min.js"></script>
+    <script src="rsa.js"></script>
+    <script src="rsa_decrypt.js"></script>
+    <script src="rsa_encrypt.js"></script>
+    <script src="demo.js"></script>
+    <script src="Cookie.js"></script>
+    <title>Title</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+    <div class = "banner">
+        <div class = "navbar">
+            <img src="images/logo.png" class="logo" alt="logo">
+            <div>
+                <a href="signup.html"><button type="button">Sign Up</button></a>
+            </div>
+        </div>
+
+        <div class="user_info">
+            <h1>Welcome Back</h1>
+            <div class="mb-1" id="insert">
+                <label for="email" class="fs-1">Email</label>
+                <input class="fs-1" type="text" id="email" name="email" onchange="checkEmail()" required><br><br>
+            </div>
+            <div class="mb-1" id="insert">
+                <label class="fs-1" for="password">Password</label>
+                <input class="fs-1" type="password" id="password" name="password" required><br><br>
+                <button class="fs-1" type="submit" id="submit" onclick="validateUser()">Submit</button>
+                <div id="loginHint" style="color: rgb(255, 255, 255);"></div>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>
+<script type="text/javascript">
+    var email_resultcode;
+    var key;
+    var id;
+    var email;
+    var server_dynamic_publickey;
+    var server_static_publickey;
+    
+    var client_key;
+    var encrypt_publickey;
+    var vi = "0000000000000000";
+    var encryptedData;
+    window.onload = function(){
+        localStorage.clear();
+    }
+
+    function checkEmail(){
+        $.ajax({
+                type: "get",
+                dataType: "json",
+                url: "http://10.11.33.103:8088/user-login/email-login",//url
+                data:  {'email':$('#email').val()},
+                complete: function(data) {
+                    console.log(data);
+                
+                    email_resultcode = data.responseJSON.resultCode;
+                    if(email_resultcode == "1"){
+                        document.getElementById("loginHint").innerHTML="";
+                        email = data.responseJSON.email;
+                        key = data.responseJSON.data;
+                        console.log(key);
+                        return true;
+                    }else{
+                        document.getElementById("loginHint").innerHTML="Email hasn't been registered.";
+                    }
+                },
+                error: function (data) {
+                    console.log(data);
+                    document.getElementById("loginHint").innerHTML="Network error";
+                }
+            });
+            return false;
+    }
+
+    function checkPwd() {
+        var pwd=document.getElementById("passwd").value;
+        if (pwd == ""){
+            document.getElementById("passwdHint").innerHTML="Cannot be empty.";
+            return false;
+        }
+        return true; 
+    }
+
+    function Encrypt(word, key) {
+        let iv = '0000000000000000';
+
+        key = CryptoJS.enc.Utf8.parse(key);
+        iv = CryptoJS.enc.Utf8.parse(iv);
+        let srcs = CryptoJS.enc.Utf8.parse(word);
+        // encrypt mode CBC，complement method: PKCS5Padding(PKCS7)
+        let encrypted = CryptoJS.AES.encrypt(srcs, key, {
+            iv: iv,
+            mode: CryptoJS.mode.CBC,
+            padding: CryptoJS.pad.Pkcs7
+        });
+        console.log(CryptoJS.enc.Base64.stringify(encrypted.ciphertext))
+        //return base64
+        return CryptoJS.enc.Base64.stringify(encrypted.ciphertext);
+    }
+
+    
+
+    function validateUser() {
+        if(email_resultcode == "1"){
+            encryptedData = Encrypt($('#password').val(),key);
+            console.log(encryptedData);
+            $.ajax({
+                type: "get",
+                dataType: "json",
+                url: "http://10.11.33.103:8088/user-login/password-verify",//url
+                data:  {'email':$('#email').val(),'encryptedKey':encryptedData},
+                complete: function(data) {
+                    console.log(data);
+                    resultcode = data.responseJSON.resultCode;
+                    if(email_resultcode == "1"){
+                        if(resultcode == "1"){
+                        // console.log(resultcode);
+                        document.getElementById("loginHint").innerHTML="Login success!";
+                        
+                        server_dynamic_publickey = data.responseJSON.data.dynamicPublicKey;
+                        server_static_publickey = data.responseJSON.data.staticPublicKey;
+                        id = data.responseJSON.data.id;
+                        client_key = generateKeyPair();
+                        demo(client_key[0],client_key[1])
+                        connect();
+                        localStorage.setItem('id',id);
+                        localStorage.setItem('server_dynamic_publicKey',server_dynamic_publickey);
+                        localStorage.setItem('server_static_publicKey',server_static_publickey);
+                        localStorage.setItem('client_publicKey',client_key[0]);
+                        localStorage.setItem('client_privateKey',client_key[1]);
+                        
+			            window.open(encodeURI('./home.html?'+'id='+id), "_self");
+                        }else{
+                            document.getElementById("loginHint").innerHTML="Wrong password or email.";
+                        }
+                    } else {
+                        document.getElementById("loginHint").innerHTML="Something went wrong.";
+                    }
+
+                    
+                },
+                error: function (data) {
+                    console.log(data);
+                    document.getElementById("loginHint").innerHTML="Network error";
+                }
+            });
+        
+        }else{
+            document.getElementById("loginHint").innerHTML="Wrong password or email.";
+        }
+    }
+
+    function connect(){
+        $.ajax({
+                type: "get",
+                dataType: "json",
+                url: "http://10.11.33.103:8088/user-login/connect-establishment",//url
+                
+                data:  {'id': id,'publicKey':client_key[0]},
+                complete: function(data) {
+                    console.log(data);
+                    email_resultcode = data.responseJSON.resultCode;
+                    key = data.responseJSON.data;
+                    console.log(key);
+                    return true;
+                },
+                error: function (data) {
+                    console.log(data);
+                    document.getElementById("loginHint").innerHTML="Network error";
+                }
+            });
+            return false;
+    }
+
+</script>
+
+<script>
+
+</script>

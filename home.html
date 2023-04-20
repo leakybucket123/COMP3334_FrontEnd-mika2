@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <!-- <script src="js/getUrlParam.js"></script>  -->
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/forge/0.10.0/forge.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsencrypt/3.0.0-rc.1/jsencrypt.min.js"></script>
+    <script src="rsa.js"></script>
+    <script src="rsa_decrypt.js"></script>
+    <script src="rsa_encrypt2.js"></script>
+    <script src="demo.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body style="background-color: #002C6D;">
+    <div class = "banner">
+        <div class = "navbar">
+            <img src="images/logo.png" class="logo" alt="logo">
+            <div>
+                <a href="trade.html"><button type="button">Trade</button></a>
+                <a href="login1.html"><button type="button" onclick="Logout()">Log Out</button></a>
+            </div>
+        </div>
+        <div class="container">
+
+            <div class = "intro">
+                <div class="slogan">
+                    <h1>Start Your Trade</h1>
+                    <p>Your first digital real estate auction experience
+                    </p>
+                </div>
+            </div>
+
+            <div class="photos" id="commodityId"></div>
+
+
+        </div>
+    </div>
+
+</body>
+
+<script>
+    var jsonArray = [];
+
+    window.onload = function(){
+        var id = localStorage.getItem('id');
+        var encrypted_data;
+        console.log(id);
+        var privateKey;
+
+        $.ajax({
+                type: "get",
+                dataType: "json",
+                url: "http://10.11.33.103:8088/estate/request-self-estate-info",//url
+                data:  {'id': id},
+                complete: function(data) {
+                    console.log(data);
+                    get_data = data.responseJSON.data;
+                    privateKey = localStorage.getItem('client_privateKey');
+                    for (var i in get_data){
+                        console.log(jsonArray);
+                        jsonArray.push(eval(get_data[i]));
+                        console.log(eval(get_data[i]));
+                    }
+                    console.log(jsonArray);
+                    loadCommodity();
+                },
+                error: function (data) {
+                    console.log(data);
+                }
+            });
+    }
+
+    function loadCommodity() {
+        var htmllet = "";
+        for (var i = 0; i < jsonArray.length; i++) {
+                htmllet += 
+                
+                    '<div class="photo">' +
+                        '<img src="images/'+getRandomImageName()+'">'+
+                        '	<h3>' + jsonArray[i].estateName + '</h3>' +
+                        '	<p>' + jsonArray[i].estateDescription + '</p>' +
+                        '	<p>' + jsonArray[i].estateOwnerId + '</p>' +
+                        '$ ' + jsonArray[i].estatePrice + 
+                    '</div>' 
+                if(jsonArray[i].estateStatus == '1'){
+                    htmllet += 
+                    '<table width="100%" border="1" cellpadding="4" cellspacing="0" '+
+                    'style="BORDER-COLLAPSE: collapse" borderColor=#000000>'+
+                    '<tr>'+
+                    '<div>' +
+                        '	<p> Someone wants to purchase your estate with price '+jsonArray[i].estatePrice+'. </p>'+
+                        '<button class="fs-1" type="submit" id="accept'+i+'" onclick="Accept('+jsonArray[i].estateOwnerId+','+jsonArray[i].estateId+')">'
+                        +'Accept'
+                        +'</button>'
+                        +'</div>'
+                    '</tr>'+
+                    '</table>'
+                }
+        }
+        console.log(htmllet);
+        document.getElementById("commodityId").innerHTML = htmllet;
+    }
+
+    function Accept(estateOwnerId,estateId){
+        $.ajax({
+                type: "get",
+                dataType: "json",
+                url: "http://10.11.33.103:8088/transaction/accept-transaction",//url
+                data:  {'userId': estateOwnerId,'estateId': estateId},
+                complete: function(data) {
+                    console.log(data);
+                    var resultCode = data.responseJSON.resultCode;
+                    if (resultCode == "1"){
+                        var sign = data.responseJSON.data;
+                        console.log(sign);
+                        sendSign(sign);
+                    } else {
+                        alert(data.responseJSON.resultMsg);
+                    }
+                },
+                error: function (data) {
+                    console.log(data);
+                    alert("Network error");
+                }
+            });
+    }
+
+    function sendSign(sign){
+        console.log(sign.transId);
+        var second_sign = rsaEncrypt2(sign.signature, localStorage.getItem('server_static_publicKey'));
+        console.log(second_sign[0]);
+        console.log(second_sign[1]);
+        $.ajax({
+                type: "post",
+                dataType: "json",
+                url: "http://10.11.33.103:8088/transaction/insert-transaction",//url
+                data:  {'buyerId': sign.buyerId,'sellerId': sign.sellerId,'transString1':second_sign[0],'transString2':second_sign[1]},
+                complete: function(data) {
+                    console.log(data);
+                    var resultCode = data.responseJSON.resultCode;
+                    if (resultCode == "1"){
+                        console.log(data);
+                    } else {
+                        alert(data.responseJSON.resultMsg);
+                    }
+                },
+                error: function (data) {
+                    console.log(data);
+                    alert("Network error");
+                }
+            });
+ 
+    }
+
+    function getRandomImageName(){
+				return "i"+(Math.floor(Math.random()*(5))+1)+".jpeg";
+	}
+
+
+
+    function Logout(){
+        localStorage.clear();
+        window.open(encodeURI('./login1.html'));
+    }
+</script>
+</html>
